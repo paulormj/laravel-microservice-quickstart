@@ -10,7 +10,8 @@ class Genero extends Model
 {
     use SoftDeletes, TraitsUuid;
     protected $fillable = ['name','is_active'];
-    protected $dates = ['deleted_at'];
+    protected $dates = ['deleted_at','updated_at','created_at'];
     public $incrementing= false;
     protected $keyType ='String';
+    protected $casts = ['is_active'=>'boolean'];
 }

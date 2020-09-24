@@ -33,6 +33,9 @@ class Category extends Model
     protected $dates = ['deleted_at'];
     public $incrementing= false;
     protected $keyType ='String';
+    protected $casts = [
+        'is_active'=>'boolean'
+    ];
 
 
    
