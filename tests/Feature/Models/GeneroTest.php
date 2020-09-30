@@ -71,7 +71,7 @@ class GeneroTest extends TestCase
   public function testDelete(){
         $genero = factory(Genero::class)->create();
        
-        $genero->delete()d
+        $genero->delete();
         
        $this->assertSoftDeleted($genero);
     }   
