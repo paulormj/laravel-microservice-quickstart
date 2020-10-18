@@ -24,6 +24,13 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Category whereName($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Category whereUpdatedAt($value)
  * @mixin \Eloquent
+ * @property \Illuminate\Support\Carbon|null $deleted_at
+ * @method static bool|null forceDelete()
+ * @method static \Illuminate\Database\Query\Builder|\App\Models\Category onlyTrashed()
+ * @method static bool|null restore()
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Category whereDeletedAt($value)
+ * @method static \Illuminate\Database\Query\Builder|\App\Models\Category withTrashed()
+ * @method static \Illuminate\Database\Query\Builder|\App\Models\Category withoutTrashed()
  */
 class Category extends Model
 {
