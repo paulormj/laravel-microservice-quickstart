@@ -97,6 +97,8 @@ class GeneroControllerTest extends TestCase
                 $response = $this->json('DELETE',
                                          route('generos.destroy',['genero'=>$genero->id])  );
                 $response->assertStatus(204);
+                $this->assertNull(Genero::find($genero->id));
+                $this->assertNotNull(Genero::withTrashed()->find($genero->id));
                
             }
 }
