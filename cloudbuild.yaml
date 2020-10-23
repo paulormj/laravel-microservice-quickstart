@@ -3,9 +3,9 @@ steps:
       name: 'gcr.io/$PROJECT_ID/docker-compose:1.24.0'
       args: ['-f','docker-compose.prod.yaml','up','-d']
 
-#    - id: "Chown in /var/www"
-#      name: 'gcr.io/cloud-builder/docker'
-#      args: ['exec', '-u','root','-t','app','chown','-R','www-data:www-data','/var/www']
+    - id: "Chown in /var/www"
+      name: 'gcr.io/cloud-builders/docker'
+      args: ['exec', '-u','root','-t','app','chown','-R','www-data:www-data','/var/www']
 
     - id: "Rodando o composer"
       name: 'gcr.io/cloud-builders/docker'
