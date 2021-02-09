@@ -9,14 +9,22 @@ use Tests\TestCase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Route;
+use Tests\Traits\TestSaves;
+use Tests\Traits\TestValidations;
 
 class GeneroControllerTest extends TestCase
 {
-    use DatabaseMigrations;
+    use DatabaseMigrations, TestValidations, TestSaves;
 
+    private $genero;
+    protected function setUp():void
+    {
+        parent::setUp();
+        $this->genero = factory(Genero::class)->create();
+
+
+    }
     public function testIndex(){
-
-        $genero = factory(Category::class)->create();
 
         $response = $this->get(route('generos.index'));
 
@@ -25,31 +33,24 @@ class GeneroControllerTest extends TestCase
     }
 
     public function testShow(){
-        $genero = factory(Genero::class)->create();
-        $response = $this->get(route('generos.show',[$genero->id]));
-        $response->assertStatus(200)->assertJson($genero->toArray());
+        $response = $this->get(route('generos.show',[$this->genero->id]));
+        $response->assertStatus(200)->assertJson($this->genero->toArray());
     }
 
     public function testInvalidationData(){
-        // dd($this->json('POST',route('generos.store'),[]));
-          $response = $this->json('POST', route('generos.store'),[]);
-          $response->assertStatus(422)->assertJsonValidationErrors(['name'])
-                   ->assertJsonMissingValidationErrors(['is_active'])
-                   //->assertJsonFragment([
-                     //  \Lang::trans('validation.required',['attribute'=> 'name'])
-                   //])
-                   ;
-          $response = $this->json('POST',route('generos.store'),
-                                  ['name'=>str_repeat('a',256),
-                                   'is_active'=>'a']);
-          $response->assertStatus(422)
-                   ->assertJsonValidationErrors(['name','is_active'])
-                   ->assertJsonFragment([\Lang::get('validation.max.string',['attribute'=>'name','max'=>255])])
-                   ->assertJsonFragment([\Lang::get('validation.boolean',['attribute'=>'is active'])])
-                  ;
+
+        $data = ['name'=>''];
+        $this->assertInvalidationInStoreAction($data,'required');
+
+       $data =  ['name'=>str_repeat('a',256)];
+        $this->assertInvalidationInStoreAction($data,'max.string',['max'=>'255']);
+       
+        $data =  ['is_active'=>'a'];
+        $this->assertInvalidationInStoreAction($data,'boolean');
+
+
           
-          $genero = factory(Genero::class)->create();
-          $response = $this->json('PUT',route('generos.update',['genero'=>$genero->id]),[]);
+          $response = $this->json('PUT',route('generos.update',['genero'=>$this->genero->id]),[]);
           $response->assertStatus(422)->assertJsonValidationErrors(['name'])
           ->assertJsonMissingValidationErrors(['is_active'])
           ->assertJsonFragment([
@@ -59,7 +60,7 @@ class GeneroControllerTest extends TestCase
 
           
           $response = $this->json('PUT',
-                                   route('generos.update',['genero'=>$genero->id]),
+                                   route('generos.update',['genero'=>$this->genero->id]),
                                    ['name'=>str_repeat('a',256),
                                     'is_active'=>'a']);
           $response->assertStatus(422)
@@ -70,7 +71,9 @@ class GeneroControllerTest extends TestCase
   }
 
             public function testStore(){
-                $response = $this->json('POST',route('generos.store'),['name'=>'add nome']);
+                $data = ['name'=>'add nome'];
+                $response = $this->assertStore($data,$data );
+                //$response = $this->json('POST',route('generos.store'),['name'=>'add nome']);
                 $id = $response->json('id');
                 $genero = Genero::find($id);
                 $response->assertStatus(201);
@@ -93,12 +96,23 @@ class GeneroControllerTest extends TestCase
             
             public function testDelete(){
 
-                $genero = factory(Genero::class)->create();
                 $response = $this->json('DELETE',
-                                         route('generos.destroy',['genero'=>$genero->id])  );
+                                         route('generos.destroy',['genero'=>$this->genero->id])  );
                 $response->assertStatus(204);
-                $this->assertNull(Genero::find($genero->id));
-                $this->assertNotNull(Genero::withTrashed()->find($genero->id));
+                $this->assertNull(Genero::find($this->genero->id));
+                $this->assertNotNull(Genero::withTrashed()->find($this->genero->id));
                
+            }
+
+            protected function routeStore(){
+                return route('generos.store');
+            }
+
+            protected function routeUpdate(){
+                return route('generos.update',['genero'=>$this->genero->id]);
+            }
+
+            protected function model (){
+                return Genero::class;
             }
 }
